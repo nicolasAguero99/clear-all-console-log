@@ -3,10 +3,10 @@ const fs = require('fs/promises');
 
 const clearConsoleProject = vscode.commands.registerCommand('clear-console-project', async function () {
   try {
-    const files = await vscode.workspace.findFiles('**/*.{js,ts,jsx,tsx}', '**/node_modules/**');
+    const files = await vscode.workspace.findFiles('**/*.{js,ts,jsx,tsx,cpp}', '**/node_modules/**');
 
     if (files.length === 0) {
-      vscode.window.showInformationMessage('No files (.js, .ts, .jsx, .tsx) found.');
+      vscode.window.showInformationMessage('No files (.js, .ts, .jsx, .tsx .cpp) found.');
       return;
     }
 
@@ -15,7 +15,7 @@ const clearConsoleProject = vscode.commands.registerCommand('clear-console-proje
         const document = await vscode.workspace.openTextDocument(file);
         const lines = document.getText().split('\n');
         const updatedLines = lines.map(line => {
-          const regex = /\s*console\.\w+\([^)]*\);?/;
+          const regex = /\s*(console\.\w+\([^)]*\);?|(?:std::)?cout\s*<<[^;]*;)/;
 
           if (regex.test(line)) {
             if (line.trim().match(regex)?.[0] === line.trim()) {
@@ -52,7 +52,7 @@ const clearConsoleFile = vscode.commands.registerCommand('clear-console-file', a
   }
 
   const document = editor.document;
-  const regex = /\s*console\.\w+\([^)]*\);?/;
+  const regex = /\s*(console\.\w+\([^)]*\);?|(?:std::)?cout\s*<<[^;]*;)/;
   const text = document.getText();
   const lines = text.split('\n');
 
@@ -89,10 +89,10 @@ const clearConsoleFile = vscode.commands.registerCommand('clear-console-file', a
 
 const clearConsoleProjectExceptError = vscode.commands.registerCommand('clear-console-project-except-error', async function () {
   try {
-    const files = await vscode.workspace.findFiles('**/*.{js,ts,jsx,tsx}', '**/node_modules/**');
+    const files = await vscode.workspace.findFiles('**/*.{js,ts,jsx,tsx,cpp}', '**/node_modules/**');
 
     if (files.length === 0) {
-      vscode.window.showInformationMessage('No files (.js, .ts, .jsx, .tsx) found.');
+      vscode.window.showInformationMessage('No files (.js, .ts, .jsx, .tsx .cpp) found.');
       return;
     }
 
@@ -101,7 +101,7 @@ const clearConsoleProjectExceptError = vscode.commands.registerCommand('clear-co
         const document = await vscode.workspace.openTextDocument(file);
         const lines = document.getText().split('\n');
         const updatedLines = lines.map(line => {
-          const regex = /\s*console\.(?!error)\w+\([^)]*\);?/;
+          const regex = /\s*(console\.\w+\([^)]*\);?|(?:std::)?cout\s*<<[^;]*;)/;
 
           if (regex.test(line)) {
             if (line.trim().match(regex)?.[0] === line.trim()) {
@@ -138,7 +138,7 @@ const clearConsoleFileExceptError = vscode.commands.registerCommand('clear-conso
   }
 
   const document = editor.document;
-  const regex = /\s*console\.(?!error)\w+\([^)]*\);?/;
+  const regex = /\s*(console\.\w+\([^)]*\);?|(?:std::)?cout\s*<<[^;]*;)/;
   const text = document.getText();
   const lines = text.split('\n');
 
